@@ -1,15 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
-import { config } from './config.js';
 
-// VERSION: 2.0 - Corregida clave SERVICE_ROLE
-
-const supabaseUrl = config.supabase.url;
-const supabaseServiceRole = config.supabase.serviceRole;
+// VERSION: 3.0 - Claves hardcodeadas para evitar problemas de variables de entorno
+const supabaseUrl = 'https://fcvwqwjsypossdqochde.supabase.co';
+const supabaseServiceRole = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjdndxd2pzeXBvc3NkcW9jaGRlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MjA3MTgxNjA4N30.6P-J5cQbnSBGYP27jJ33JVCO23z_JcoTFgqmGZDgPXE';
 
 const supabase = createClient(supabaseUrl, supabaseServiceRole);
 
 export async function handler(event) {
-  console.log('🔍 admin-supa recibió request (V2):', {
+  console.log('🔍 admin-supa recibió request (V3 - Claves hardcodeadas):', {
     method: event.httpMethod,
     body: event.body,
     headers: event.headers
