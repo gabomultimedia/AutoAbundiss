@@ -19,7 +19,7 @@ export const config = {
   // Supabase
   supabase: {
     url: process.env.SUPABASE_URL || 'https://fcvwqwjsypossdqochde.supabase.co',
-    serviceRole: process.env.SUPABASE_SERVICE_ROLE || 'tu-service-role-key',
+    serviceRole: process.env.SUPABASE_SERVICE_ROLE || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjdndxd2pzeXBvc3NkcW9jaGRlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MjA3MTgxNjA4N30.6P-J5cQbnSBGYP27jJ33JVCO23z_JcoTFgqmGZDgPXE',
     bucket: process.env.SUPABASE_BUCKET || 'abundiss-files'
   },
   
