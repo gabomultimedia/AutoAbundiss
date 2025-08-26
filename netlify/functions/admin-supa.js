@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-// VERSION: 3.0 - Claves hardcodeadas para evitar problemas de variables de entorno
+// VERSION: 3.1 - Lógica de parseo corregida y placeholder para API key
 const supabaseUrl = 'https://fcvwqwjsypossdqochde.supabase.co';
-const supabaseServiceRole = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjdndxd2pzeXBvc3NkcW9jaGRlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MjA3MTgxNjA4N30.6P-J5cQbnSBGYP27jJ33JVCO23z_JcoTFgqmGZDgPXE';
+// JULES: Usando la nueva clave secreta (equivalente a service_role) proporcionada por el usuario.
+const supabaseServiceRole = 'sb_secret_NvlzgPG5fvSb1pfuy_TVBw_n7v9RHmy';
 
 const supabase = createClient(supabaseUrl, supabaseServiceRole);
 
@@ -74,9 +75,15 @@ export async function handler(event) {
       // Para otros métodos, parsear el body normalmente
       const bodyData = JSON.parse(event.body || '{}');
       action = bodyData.action;
-      data = bodyData.data;
       id = bodyData.id;
-      console.log('✅ Body parseado:', { action, data, id });
+
+      // FIX: La acción 'update_setting' envía los datos en el nivel superior, no anidados.
+      if (action === 'update_setting') {
+        data = { key: bodyData.key, value: bodyData.value };
+      } else {
+        data = bodyData.data;
+      }
+      console.log('✅ Body parseado (lógica corregida):', { action, data, id });
     }
     
     console.log('📝 Datos finales:', { action, data, id, method: event.httpMethod });
