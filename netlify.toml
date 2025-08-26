@@ -5,6 +5,9 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  # Solo variables esenciales para el build (reducir tamaño)
+  SUPABASE_URL = "https://fcvwqwjsypossdqochde.supabase.co"
+  SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjdndxd2pzeXBvc3NkcW9jaGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNDAwODcsImV4cCI6MjA3MTgxNjA4N30.FK40wJgJyHDnte-JLVdlvDLRsIIs3lReKkZLSpNYSgk"
 
 [functions]
   node_bundler = "esbuild"
