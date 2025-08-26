@@ -1,4 +1,6 @@
 -- Crear tabla para almacenar tokens OAuth de Kommo
+-- Ejecutar en Supabase SQL Editor
+
 create table if not exists public.oauth_tokens (
   provider text primary key,       -- 'kommo'
   access_token text,
@@ -17,7 +19,5 @@ create policy "server-only" on public.oauth_tokens
 -- Crear índice para mejorar performance
 create index if not exists idx_oauth_tokens_provider on public.oauth_tokens(provider);
 
--- Insertar token inicial si es necesario (opcional)
--- insert into public.oauth_tokens (provider, access_token, refresh_token, expires_at)
--- values ('kommo', null, null, null)
--- on conflict (provider) do nothing;
+-- Mensaje de confirmación
+SELECT 'Tabla oauth_tokens creada exitosamente' as status;
