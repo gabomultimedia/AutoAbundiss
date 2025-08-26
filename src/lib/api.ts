@@ -264,12 +264,32 @@ export const calendarAPI = {
     endISO: string;
     notes?: string;
   }): Promise<{ id: string; htmlLink: string }> => {
+    // Convertir el formato de la API al formato del esquema de Supabase
+    const eventData = {
+      title: event.title,
+      description: event.notes,
+      start_time: event.startISO,
+      end_time: event.endISO,
+      gcal_id: `local_${Date.now()}`, // ID temporal local
+      html_link: '', // Se llenará después
+      metadata: {
+        source: 'abundiss_console',
+        created_via: 'calendar_form'
+      }
+    };
+
     const response = await fetch(`${API_BASE}/admin-supa`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'create_gcal_event', data: event }),
+      body: JSON.stringify({ action: 'create_gcal_event', data: eventData }),
     });
-    return handleResponse<{ id: string; htmlLink: string }>(response);
+    
+    const result = await handleResponse<GcalEvent>(response);
+    
+    return {
+      id: result.id || '',
+      htmlLink: result.html_link || ''
+    };
   },
 };
 

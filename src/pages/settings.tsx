@@ -57,9 +57,20 @@ export default function Settings() {
     try {
       setSaving(true);
       
+      console.log('Guardando configuración:', {
+        app_name: settings.appName,
+        logo_url: settings.logoUrl ? 'base64_data' : 'no_logo',
+        brand_colors: settings.brandColors
+      });
+      
       await settingsAPI.update('app_name', settings.appName);
+      console.log('✅ app_name guardado');
+      
       await settingsAPI.update('logo_url', settings.logoUrl);
+      console.log('✅ logo_url guardado');
+      
       await settingsAPI.update('brand_colors', settings.brandColors);
+      console.log('✅ brand_colors guardado');
       
       addToast({
         type: 'success',
@@ -70,10 +81,11 @@ export default function Settings() {
       // Recargar la página para aplicar los cambios
       window.location.reload();
     } catch (error) {
+      console.error('❌ Error guardando configuración:', error);
       addToast({
         type: 'error',
         title: 'Error guardando configuración',
-        message: 'No se pudieron guardar los cambios',
+        message: `Error: ${error instanceof Error ? error.message : 'Desconocido'}`,
       });
     } finally {
       setSaving(false);
