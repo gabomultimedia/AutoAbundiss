@@ -100,6 +100,7 @@ export default function Login() {
                 className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="Ingresa tu contraseña"
                 disabled={isLoading}
+                autoComplete="current-password"
               />
             </div>
 

@@ -6,10 +6,18 @@
 [build.environment]
   NODE_VERSION = "18"
 
+[functions]
+  node_bundler = "esbuild"
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
+
+# Función programada para refresh automático de tokens cada 12 horas
+[[scheduled.functions]]
+  schedule = "0 */12 * * *"
+  path = "/.netlify/functions/kommo-scheduled-refresh"
 
 [[redirects]]
   from = "/*"

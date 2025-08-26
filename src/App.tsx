@@ -11,6 +11,7 @@ import Knowledge from './pages/knowledge';
 import Calendar from './pages/calendar';
 import Files from './pages/files';
 import Settings from './pages/settings';
+import OAuthSuccess from './pages/oauth-success';
 
 // Componente para proteger rutas
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -63,6 +64,9 @@ export default function App() {
         <Route path="files" element={<Files />} />
         <Route path="settings" element={<Settings />} />
       </Route>
+      
+      {/* Ruta pública para OAuth callback */}
+      <Route path="/oauth/success" element={<OAuthSuccess />} />
       
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

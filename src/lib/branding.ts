@@ -3,7 +3,7 @@ import { settingsAPI } from './api';
 // Configuración por defecto del branding
 export const defaultBranding = {
   appName: 'Abundiss Console',
-  logoUrl: import.meta.env.VITE_APP_LOGO_URL || null,
+  logoUrl: import.meta.env.VITE_APP_LOGO_URL || 'https://abundiss.com/wp-content/uploads/2021/11/LogoB.png',
   colors: {
     primary: '#0ea5e9',
     accent: '#8b5cf6',
