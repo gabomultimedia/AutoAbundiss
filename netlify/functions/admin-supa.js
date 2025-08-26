@@ -46,8 +46,31 @@ export async function handler(event) {
   }
 
   try {
-    const { action, data, id } = JSON.parse(event.body || '{}');
-    console.log('📝 Datos parseados:', { action, data, id });
+    // Para DELETE, el body puede estar vacío, así que manejamos ambos casos
+    let action, data, id;
+    
+    if (event.httpMethod === 'DELETE') {
+      // Para DELETE, intentar parsear el body o usar query parameters
+      try {
+        const bodyData = JSON.parse(event.body || '{}');
+        action = bodyData.action;
+        data = bodyData.data;
+        id = bodyData.id;
+      } catch (parseError) {
+        // Si no se puede parsear, usar query parameters
+        action = event.queryStringParameters?.action;
+        data = event.queryStringParameters?.data ? JSON.parse(event.queryStringParameters.data) : {};
+        id = event.queryStringParameters?.id;
+      }
+    } else {
+      // Para otros métodos, parsear el body normalmente
+      const bodyData = JSON.parse(event.body || '{}');
+      action = bodyData.action;
+      data = bodyData.data;
+      id = bodyData.id;
+    }
+    
+    console.log('📝 Datos parseados:', { action, data, id, method: event.httpMethod });
 
     if (!action) {
       return {
@@ -81,7 +104,10 @@ export async function handler(event) {
         break;
       
       case 'delete_promotion':
-        console.log('🗑️ Eliminando promoción:', { id });
+        console.log('🗑️ Eliminando promoción:', { id, method: event.httpMethod });
+        if (!id) {
+          throw new Error('ID es requerido para eliminar promoción');
+        }
         result = await supabase.from('promotions').delete().eq('id', id);
         console.log('✅ Resultado delete_promotion:', result);
         break;
