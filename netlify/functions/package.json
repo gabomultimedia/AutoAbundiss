@@ -1,0 +1,13 @@
+{
+  "name": "abundiss-console-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions para Abundiss Console",
+  "main": "index.js",
+  "dependencies": {
+    "@netlify/functions": "^2.0.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.5"
+  }
+}
