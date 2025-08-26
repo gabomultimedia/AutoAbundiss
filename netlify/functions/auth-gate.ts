@@ -1,9 +1,10 @@
 import { Handler } from '@netlify/functions';
 import jwt from 'jsonwebtoken';
+import { config } from './config.js';
 
-const SESSION_SECRET = process.env.SESSION_SECRET || 'fallback-secret';
-const BASIC_USER = process.env.PANEL_BASIC_USER || 'admin';
-const BASIC_PASS = process.env.PANEL_BASIC_PASS || 'password';
+const SESSION_SECRET = config.panel.sessionSecret;
+const BASIC_USER = config.panel.basicUser;
+const BASIC_PASS = config.panel.basicPass;
 
 export const handler: Handler = async (event) => {
   // Configurar CORS
