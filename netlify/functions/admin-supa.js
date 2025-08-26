@@ -164,7 +164,7 @@ export async function handler(event) {
         // Usar upsert para insertar o actualizar
         result = await supabase
           .from('app_settings')
-          .upsert({ key: data.key, value: data.value })
+          .upsert({ key: data.key, value: data.value }, { onConflict: 'key' })
           .select()
           .single();
         console.log('Resultado update_setting:', result);
