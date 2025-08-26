@@ -142,7 +142,7 @@ export const promotionsAPI = {
       .eq('is_active', true)
       .lte('starts_at', now)
       .gte('ends_at', now)
-      .order('priority', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);
     return data || [];
