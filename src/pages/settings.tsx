@@ -92,16 +92,40 @@ export default function Settings() {
 
   const handleLogoUpload = async (file: File) => {
     try {
-      // En un entorno real, aquí se subiría el archivo a Supabase Storage
-      // Por ahora, simulamos la URL
-      const logoUrl = URL.createObjectURL(file);
-      setSettings(prev => ({ ...prev, logoUrl }));
+      // Validar tamaño del archivo (máximo 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        addToast({
+          type: 'error',
+          title: 'Archivo muy grande',
+          message: 'El logo debe ser menor a 2MB',
+        });
+        return;
+      }
+
+      // Validar tipo de archivo
+      if (!file.type.startsWith('image/')) {
+        addToast({
+          type: 'error',
+          title: 'Tipo de archivo no válido',
+          message: 'Solo se permiten archivos de imagen',
+        });
+        return;
+      }
+
+      // Convertir a base64 para almacenamiento temporal
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        setSettings(prev => ({ ...prev, logoUrl: base64 }));
+        
+        addToast({
+          type: 'success',
+          title: 'Logo actualizado',
+          message: 'El logo se actualizó exitosamente',
+        });
+      };
+      reader.readAsDataURL(file);
       
-      addToast({
-        type: 'success',
-        title: 'Logo actualizado',
-        message: 'El logo se actualizó exitosamente',
-      });
     } catch (error) {
       addToast({
         type: 'error',

@@ -254,8 +254,8 @@ function PromotionForm({ promotion, onClose, onSubmit }: PromotionFormProps) {
   const [formData, setFormData] = useState({
     title: promotion?.title || '',
     description: promotion?.description || '',
-    discount_percent: promotion?.discount_percent || undefined,
-    discount_amount: promotion?.discount_amount || undefined,
+    discount_percent: promotion?.discount_percent !== undefined ? promotion.discount_percent : undefined,
+    discount_amount: promotion?.discount_amount !== undefined ? promotion.discount_amount : undefined,
     starts_at: promotion?.starts_at ? promotion.starts_at.split('T')[0] : '',
     ends_at: promotion?.ends_at ? promotion.ends_at.split('T')[0] : '',
     is_active: promotion?.is_active ?? true,
@@ -268,11 +268,19 @@ function PromotionForm({ promotion, onClose, onSubmit }: PromotionFormProps) {
       return;
     }
 
-    onSubmit({
+    // Asegurar que solo se envíe un tipo de descuento
+    const submitData = {
       ...formData,
       starts_at: new Date(formData.starts_at).toISOString(),
       ends_at: new Date(formData.ends_at).toISOString(),
-    });
+    };
+
+    // Si no hay descuento seleccionado, usar porcentaje por defecto
+    if (submitData.discount_percent === undefined && submitData.discount_amount === undefined) {
+      submitData.discount_percent = 0;
+    }
+
+    onSubmit(submitData);
   };
 
   return (
@@ -308,10 +316,53 @@ function PromotionForm({ promotion, onClose, onSubmit }: PromotionFormProps) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Tipo de Descuento
+            </label>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  id="discount_percent"
+                  name="discount_type"
+                  checked={formData.discount_percent !== undefined}
+                  onChange={() => setFormData(prev => ({ 
+                    ...prev, 
+                    discount_percent: 0,
+                    discount_amount: undefined 
+                  }))}
+                  className="text-primary focus:ring-primary"
+                />
+                <label htmlFor="discount_percent" className="text-sm text-foreground">
+                  Porcentaje (%)
+                </label>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  id="discount_amount"
+                  name="discount_type"
+                  checked={formData.discount_amount !== undefined}
+                  onChange={() => setFormData(prev => ({ 
+                    ...prev, 
+                    discount_amount: 0,
+                    discount_percent: undefined 
+                  }))}
+                  className="text-primary focus:ring-primary"
+                />
+                <label htmlFor="discount_amount" className="text-sm text-foreground">
+                  Monto fijo ($)
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {formData.discount_percent !== undefined && (
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Descuento %
+                Descuento (%)
               </label>
               <input
                 type="number"
@@ -320,15 +371,18 @@ function PromotionForm({ promotion, onClose, onSubmit }: PromotionFormProps) {
                 value={formData.discount_percent || ''}
                 onChange={(e) => setFormData(prev => ({ 
                   ...prev, 
-                  discount_percent: e.target.value ? parseInt(e.target.value) : undefined 
+                  discount_percent: e.target.value ? parseInt(e.target.value) : 0 
                 }))}
                 className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                required
               />
             </div>
+          )}
 
+          {formData.discount_amount !== undefined && (
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Descuento $
+                Descuento ($)
               </label>
               <input
                 type="number"
@@ -337,12 +391,13 @@ function PromotionForm({ promotion, onClose, onSubmit }: PromotionFormProps) {
                 value={formData.discount_amount || ''}
                 onChange={(e) => setFormData(prev => ({ 
                   ...prev, 
-                  discount_amount: e.target.value ? parseFloat(e.target.value) : undefined 
+                  discount_amount: e.target.value ? parseFloat(e.target.value) : 0 
                 }))}
                 className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                required
               />
             </div>
-          </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>

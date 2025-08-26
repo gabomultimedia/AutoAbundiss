@@ -4,7 +4,6 @@ import {
   LayoutDashboard, 
   MessageSquare, 
   Tag, 
-  FolderOpen, 
   Calendar, 
   FileText, 
   Settings 
@@ -18,7 +17,6 @@ const navItems = [
   { name: 'Promociones', icon: Tag, path: '/promotions' },
   { name: 'Base de Conocimiento', icon: FileText, path: '/knowledge' },
   { name: 'Calendario', icon: Calendar, path: '/calendar' },
-  { name: 'Archivos', icon: FolderOpen, path: '/files' },
   { name: 'Configuración', icon: Settings, path: '/settings' },
 ];
 

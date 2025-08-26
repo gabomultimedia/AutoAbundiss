@@ -4,7 +4,6 @@ import type {
   Promotion, 
   KbEntry, 
   GcalEvent, 
-  FileLog,
   LoginForm 
 } from './schema';
 
@@ -149,21 +148,45 @@ export const promotionsAPI = {
   },
 
   create: async (promotion: Omit<Promotion, 'id' | 'created_at' | 'updated_at'>): Promise<Promotion> => {
+    // Crear promoción en Supabase
     const response = await fetch(`${API_BASE}/admin-supa`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'create_promotion', data: promotion }),
     });
-    return handleResponse(response);
+    const createdPromotion = await handleResponse(response);
+    
+    // Enviar a Kommo si está activa
+    if (createdPromotion.is_active) {
+      try {
+        await sendPromotionToKommo(createdPromotion);
+      } catch (error) {
+        console.warn('Error enviando promoción a Kommo:', error);
+      }
+    }
+    
+    return createdPromotion;
   },
 
   update: async (id: string, promotion: Partial<Promotion>): Promise<Promotion> => {
+    // Actualizar promoción en Supabase
     const response = await fetch(`${API_BASE}/admin-supa`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'update_promotion', id, data: promotion }),
     });
-    return handleResponse(response);
+    const updatedPromotion = await handleResponse(response);
+    
+    // Enviar a Kommo si está activa
+    if (updatedPromotion.is_active) {
+      try {
+        await sendPromotionToKommo(updatedPromotion);
+      } catch (error) {
+        console.warn('Error enviando promoción actualizada a Kommo:', error);
+      }
+    }
+    
+    return updatedPromotion;
   },
 
   delete: async (id: string): Promise<void> => {
@@ -250,41 +273,7 @@ export const calendarAPI = {
   },
 };
 
-// Files API
-export const filesAPI = {
-  getAll: async (): Promise<FileLog[]> => {
-    const { data, error } = await supabase
-      .from('files_log')
-      .select('*')
-      .order('created_at', { ascending: false });
 
-    if (error) throw new Error(error.message);
-    return data || [];
-  },
-
-  upload: async (file: File, description?: string, tags?: string[]): Promise<FileLog> => {
-    const response = await fetch(`${API_BASE}/admin-supa`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        action: 'upload_file', 
-        filename: file.name,
-        description,
-        tags: tags || []
-      }),
-    });
-    return handleResponse(response);
-  },
-
-  delete: async (id: string): Promise<void> => {
-    const response = await fetch(`${API_BASE}/admin-supa`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'delete_file', id }),
-    });
-    await handleResponse(response);
-  },
-};
 
 // Settings API
 export const settingsAPI = {
@@ -308,3 +297,31 @@ export const settingsAPI = {
     await handleResponse(response);
   },
 };
+
+// Función para enviar promociones a Kommo
+async function sendPromotionToKommo(promotion: Promotion) {
+  try {
+    const response = await fetch(`${API_BASE}/kommo-send-promotion`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: promotion.title,
+        description: promotion.description,
+        discount_type: promotion.discount_percent !== undefined ? 'percentage' : 'amount',
+        discount_value: promotion.discount_percent !== undefined ? promotion.discount_percent : promotion.discount_amount,
+        starts_at: promotion.starts_at,
+        ends_at: promotion.ends_at,
+        is_active: promotion.is_active
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error enviando a Kommo: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error enviando promoción a Kommo:', error);
+    throw error;
+  }
+}
