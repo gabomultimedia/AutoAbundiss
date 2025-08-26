@@ -9,7 +9,7 @@ import Conversations from './pages/conversations';
 import Promotions from './pages/promotions';
 import Knowledge from './pages/knowledge';
 import Calendar from './pages/calendar';
-import Files from './pages/files';
+
 import Settings from './pages/settings';
 import OAuthSuccess from './pages/oauth-success';
 
@@ -61,7 +61,7 @@ export default function App() {
         <Route path="promotions" element={<Promotions />} />
         <Route path="knowledge" element={<Knowledge />} />
         <Route path="calendar" element={<Calendar />} />
-        <Route path="files" element={<Files />} />
+        
         <Route path="settings" element={<Settings />} />
       </Route>
       

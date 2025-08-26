@@ -154,7 +154,7 @@ export const promotionsAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'create_promotion', data: promotion }),
     });
-    const createdPromotion = await handleResponse(response);
+    const createdPromotion = await handleResponse<Promotion>(response);
     
     // Enviar a Kommo si está activa
     if (createdPromotion.is_active) {
@@ -175,7 +175,7 @@ export const promotionsAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'update_promotion', id, data: promotion }),
     });
-    const updatedPromotion = await handleResponse(response);
+    const updatedPromotion = await handleResponse<Promotion>(response);
     
     // Enviar a Kommo si está activa
     if (updatedPromotion.is_active) {
@@ -229,7 +229,7 @@ export const kbAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'create_kb_entry', data: entry }),
     });
-    return handleResponse(response);
+    return handleResponse<KbEntry>(response);
   },
 
   update: async (id: string, entry: Partial<KbEntry>): Promise<KbEntry> => {
@@ -238,7 +238,7 @@ export const kbAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'update_kb_entry', id, data: entry }),
     });
-    return handleResponse(response);
+    return handleResponse<KbEntry>(response);
   },
 
   delete: async (id: string): Promise<void> => {
@@ -255,7 +255,7 @@ export const kbAPI = {
 export const calendarAPI = {
   getEvents: async (): Promise<GcalEvent[]> => {
     const response = await fetch(`${API_BASE}/gcal-list`);
-    return handleResponse(response);
+    return handleResponse<GcalEvent[]>(response);
   },
 
   createEvent: async (event: {
@@ -264,12 +264,12 @@ export const calendarAPI = {
     endISO: string;
     notes?: string;
   }): Promise<{ id: string; htmlLink: string }> => {
-    const response = await fetch(`${API_BASE}/gcal-create`, {
+    const response = await fetch(`${API_BASE}/admin-supa`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(event),
+      body: JSON.stringify({ action: 'create_gcal_event', data: event }),
     });
-    return handleResponse(response);
+    return handleResponse<{ id: string; htmlLink: string }>(response);
   },
 };
 
@@ -294,7 +294,7 @@ export const settingsAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'update_setting', key, value }),
     });
-    await handleResponse(response);
+    await handleResponse<any>(response);
   },
 };
 
