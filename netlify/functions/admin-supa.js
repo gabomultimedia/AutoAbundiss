@@ -13,10 +13,11 @@ export async function handler(event) {
     headers: event.headers
   });
 
-  // Verificar conexión a Supabase
+  // Test simple de conexión a Supabase
   try {
+    console.log('🔌 Probando conexión a Supabase...');
     const { data: testData, error: testError } = await supabase.from('app_settings').select('count').limit(1);
-    console.log('✅ Conexión a Supabase OK:', { testData, testError });
+    console.log('✅ Conexión a Supabase OK:', { testData, error: testError?.message });
   } catch (testErr) {
     console.error('❌ Error conectando a Supabase:', testErr);
     return {
@@ -46,31 +47,39 @@ export async function handler(event) {
   }
 
   try {
+    console.log('📥 Procesando request...');
+    
     // Para DELETE, el body puede estar vacío, así que manejamos ambos casos
     let action, data, id;
     
     if (event.httpMethod === 'DELETE') {
+      console.log('🗑️ Procesando DELETE...');
       // Para DELETE, intentar parsear el body o usar query parameters
       try {
         const bodyData = JSON.parse(event.body || '{}');
         action = bodyData.action;
         data = bodyData.data;
         id = bodyData.id;
+        console.log('✅ DELETE body parseado:', { action, data, id });
       } catch (parseError) {
+        console.log('⚠️ No se pudo parsear DELETE body, usando query params');
         // Si no se puede parsear, usar query parameters
         action = event.queryStringParameters?.action;
         data = event.queryStringParameters?.data ? JSON.parse(event.queryStringParameters.data) : {};
         id = event.queryStringParameters?.id;
+        console.log('✅ DELETE query params:', { action, data, id });
       }
     } else {
+      console.log('📝 Procesando método:', event.httpMethod);
       // Para otros métodos, parsear el body normalmente
       const bodyData = JSON.parse(event.body || '{}');
       action = bodyData.action;
       data = bodyData.data;
       id = bodyData.id;
+      console.log('✅ Body parseado:', { action, data, id });
     }
     
-    console.log('📝 Datos parseados:', { action, data, id, method: event.httpMethod });
+    console.log('📝 Datos finales:', { action, data, id, method: event.httpMethod });
 
     if (!action) {
       return {
