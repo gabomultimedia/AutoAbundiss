@@ -1,7 +1,8 @@
 import { Handler } from '@netlify/functions';
 import jwt from 'jsonwebtoken';
+import { config } from './config.js';
 
-const SESSION_SECRET = process.env.SESSION_SECRET || 'fallback-secret';
+const SESSION_SECRET = config.panel.sessionSecret;
 
 export const handler: Handler = async (event) => {
   const headers = {

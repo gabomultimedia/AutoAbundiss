@@ -1,8 +1,9 @@
 import { Handler } from '@netlify/functions';
 import { createClient } from '@supabase/supabase-js';
+import { config } from './config.js';
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE!;
+const supabaseUrl = config.supabase.url;
+const supabaseServiceRole = config.supabase.serviceRole;
 const supabase = createClient(supabaseUrl, supabaseServiceRole);
 
 export const handler: Handler = async (event) => {

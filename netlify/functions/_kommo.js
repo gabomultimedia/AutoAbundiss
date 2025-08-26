@@ -1,17 +1,13 @@
 import fetch from "node-fetch";
-
-const must = (v, name) => {
-  if (!v) throw new Error(`Missing env ${name}`);
-  return v;
-};
+import { config } from "./config.js";
 
 export const env = {
-  baseUrl: must(process.env.KOMMO_BASE_URL, "KOMMO_BASE_URL"),
-  clientId: must(process.env.KOMMO_CLIENT_ID, "KOMMO_CLIENT_ID"),
-  clientSecret: must(process.env.KOMMO_CLIENT_SECRET, "KOMMO_CLIENT_SECRET"),
-  redirectUri: must(process.env.KOMMO_REDIRECT_URI, "KOMMO_REDIRECT_URI"),
-  supabaseUrl: must(process.env.SUPABASE_URL, "SUPABASE_URL"),
-  supabaseServiceRole: must(process.env.SUPABASE_SERVICE_ROLE, "SUPABASE_SERVICE_ROLE"),
+  baseUrl: config.kommo.baseUrl,
+  clientId: config.kommo.clientId,
+  clientSecret: config.kommo.clientSecret,
+  redirectUri: config.kommo.redirectUri,
+  supabaseUrl: config.supabase.url,
+  supabaseServiceRole: config.supabase.serviceRole,
 };
 
 const supabaseFetch = async (path, init = {}) => {
