@@ -188,7 +188,7 @@ export default function Files() {
                       {file.uploaded_by}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      {new Date(file.created_at).toLocaleDateString('es-ES')}
+                      {file.created_at ? new Date(file.created_at).toLocaleDateString('es-ES') : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex items-center gap-2">

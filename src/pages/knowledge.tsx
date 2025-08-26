@@ -183,10 +183,10 @@ export default function Knowledge() {
             )}
 
             <div className="text-xs text-muted-foreground">
-              Creada: {new Date(entry.created_at).toLocaleDateString('es-ES')}
+              Creada: {entry.created_at ? new Date(entry.created_at).toLocaleDateString('es-ES') : 'N/A'}
               {entry.updated_at !== entry.created_at && (
                 <span className="ml-4">
-                  Actualizada: {new Date(entry.updated_at).toLocaleDateString('es-ES')}
+                  Actualizada: {entry.updated_at ? new Date(entry.updated_at).toLocaleDateString('es-ES') : 'N/A'}
                 </span>
               )}
             </div>

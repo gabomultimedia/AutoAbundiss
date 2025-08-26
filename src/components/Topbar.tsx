@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { LogOut, Bell, Search } from 'lucide-react';
 import { useAuth } from '../store/useAuth';
 import { useToast } from '../store/useToast';

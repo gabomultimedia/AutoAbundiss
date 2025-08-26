@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+
+import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   MessageSquare, 
@@ -23,7 +23,7 @@ const navItems = [
 ];
 
 export default function Sidebar() {
-  const location = useLocation();
+
   const { user } = useAuth();
 
   return (
@@ -36,7 +36,7 @@ export default function Sidebar() {
         <ul className="space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+
             
             return (
               <li key={item.name}>

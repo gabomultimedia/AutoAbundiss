@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Settings, Palette, Upload, Save, Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Palette, Upload, Save, Eye, EyeOff } from 'lucide-react';
 import { settingsAPI } from '../lib/api';
 import { useToast } from '../store/useToast';
 import { BrandLogo } from '../components/BrandLogo';
@@ -131,7 +131,7 @@ export default function Settings() {
       {/* Configuración general */}
       <div className="bg-card border border-border rounded-lg p-6">
         <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-          <Settings className="w-5 h-5" />
+          <Palette className="w-5 h-5" />
           Configuración General
         </h3>
         

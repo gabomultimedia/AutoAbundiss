@@ -1,7 +1,5 @@
-import React from 'react';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { useToast } from '../store/useToast';
-import type { ToastType } from '../store/useToast';
 
 const toastIcons = {
   success: CheckCircle,

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, Calendar, MessageSquare } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Filter } from 'lucide-react';
 import { conversationsAPI } from '../lib/api';
 import { useToast } from '../store/useToast';
 import type { Conversation } from '../lib/schema';
@@ -211,7 +211,7 @@ export default function Conversations() {
                     {conv.reply}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                    {new Date(conv.created_at).toLocaleDateString('es-ES')}
+                    {conv.created_at ? new Date(conv.created_at).toLocaleDateString('es-ES') : 'N/A'}
                   </td>
                 </tr>
               ))}

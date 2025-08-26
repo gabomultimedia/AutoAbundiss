@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { defaultBranding } from '../lib/branding';
 
 interface BrandLogoProps {

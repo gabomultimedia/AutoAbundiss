@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   BarChart, 
   Bar, 
@@ -16,10 +16,7 @@ import {
   MessageSquare, 
   Tag, 
   Calendar, 
-  Upload, 
-  TrendingUp,
-  Users,
-  DollarSign
+  TrendingUp
 } from 'lucide-react';
 import { conversationsAPI, promotionsAPI, calendarAPI } from '../lib/api';
 import { useToast } from '../store/useToast';
@@ -218,7 +215,7 @@ export default function Dashboard() {
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {chartData.map((entry, index) => (
+                  {chartData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -270,7 +267,7 @@ export default function Dashboard() {
                     {conv.message}
                   </td>
                   <td className="py-3 text-sm text-muted-foreground">
-                    {new Date(conv.created_at).toLocaleDateString('es-ES')}
+                    {conv.created_at ? new Date(conv.created_at).toLocaleDateString('es-ES') : 'N/A'}
                   </td>
                 </tr>
               ))}
