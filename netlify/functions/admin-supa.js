@@ -1,13 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 import { config } from './config.js';
 
+// VERSION: 2.0 - Corregida clave SERVICE_ROLE
+
 const supabaseUrl = config.supabase.url;
 const supabaseServiceRole = config.supabase.serviceRole;
 
 const supabase = createClient(supabaseUrl, supabaseServiceRole);
 
 export async function handler(event) {
-  console.log('🔍 admin-supa recibió request:', {
+  console.log('🔍 admin-supa recibió request (V2):', {
     method: event.httpMethod,
     body: event.body,
     headers: event.headers
