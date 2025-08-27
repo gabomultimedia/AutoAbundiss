@@ -28,7 +28,7 @@ interface DashboardStats {
   byIntent: Record<string, number>;
   totalPromotions: number;
   activePromotions: number;
-  upcomingEvents: number;
+  upcomingAppointments: number; // Cambiado de upcomingEvents
 }
 
 const COLORS = ['#0ea5e9', '#8b5cf6', '#f59e0b', '#ef4444'];
@@ -40,10 +40,11 @@ export default function Dashboard() {
     byIntent: {},
     totalPromotions: 0,
     activePromotions: 0,
-    upcomingEvents: 0,
+    upcomingAppointments: 0, // Cambiado
   });
   const [recentConversations, setRecentConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -54,30 +55,54 @@ export default function Dashboard() {
     try {
       setIsLoading(true);
       
+      console.log('📊 Cargando datos del dashboard...');
+      
       // Cargar estadísticas de conversaciones
       const convStats = await conversationsAPI.getStats();
+      console.log('✅ Estadísticas de conversaciones cargadas:', convStats);
       
       // Cargar promociones
       const allPromotions = await promotionsAPI.getAll();
       const activePromotions = await promotionsAPI.getActive();
+      console.log('✅ Promociones cargadas:', { total: allPromotions.length, activas: activePromotions.length });
       
-      // Cargar eventos del calendario
+      // Cargar eventos del calendario (citas próximas)
       const events = await calendarAPI.getEvents();
+      const upcomingAppointments = events.filter(event => {
+        const eventDate = new Date(event.start_time);
+        const now = new Date();
+        return eventDate > now;
+      });
+      console.log('✅ Eventos del calendario cargados:', { total: events.length, próximos: upcomingAppointments.length });
       
       // Cargar conversaciones recientes
       const recent = await conversationsAPI.getAll({ limit: 10 });
+      console.log('✅ Conversaciones recientes cargadas:', recent.data?.length || 0);
+      
+      // Generar datos semanales reales
+      const weeklyStats = await generateWeeklyStats();
+      setWeeklyData(weeklyStats);
       
       setStats({
-        totalConversations: convStats.total,
-        conversationsLast7Days: convStats.last7Days,
-        byIntent: convStats.byIntent,
-        totalPromotions: allPromotions.length,
-        activePromotions: activePromotions.length,
-        upcomingEvents: events.length,
+        totalConversations: convStats.total || 0,
+        conversationsLast7Days: convStats.last7Days || 0,
+        byIntent: convStats.byIntent || {},
+        totalPromotions: allPromotions.length || 0,
+        activePromotions: activePromotions.length || 0,
+        upcomingAppointments: upcomingAppointments.length || 0,
       });
       
-      setRecentConversations(recent.data);
+      setRecentConversations(recent.data || []);
+      
+      console.log('🎯 Dashboard actualizado con datos reales:', {
+        conversaciones: convStats.total || 0,
+        conversaciones7d: convStats.last7Days || 0,
+        promocionesActivas: activePromotions.length || 0,
+        citasPróximas: upcomingAppointments.length || 0
+      });
+      
     } catch (error) {
+      console.error('❌ Error cargando dashboard:', error);
       addToast({
         type: 'error',
         title: 'Error cargando dashboard',
@@ -85,6 +110,52 @@ export default function Dashboard() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Función para generar estadísticas semanales reales
+  const generateWeeklyStats = async () => {
+    try {
+      const now = new Date();
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - now.getDay() + 1); // Lunes
+      weekStart.setHours(0, 0, 0, 0);
+      
+      const weekDays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+      const weeklyData = [];
+      
+      for (let i = 0; i < 7; i++) {
+        const dayStart = new Date(weekStart);
+        dayStart.setDate(weekStart.getDate() + i);
+        const dayEnd = new Date(dayStart);
+        dayEnd.setDate(dayStart.getDate() + 1);
+        
+        // Contar conversaciones del día
+        const dayConversations = await conversationsAPI.getAll({
+          startDate: dayStart.toISOString(),
+          endDate: dayEnd.toISOString()
+        });
+        
+        weeklyData.push({
+          day: weekDays[i],
+          count: dayConversations.data?.length || 0,
+          date: dayStart.toISOString()
+        });
+      }
+      
+      return weeklyData;
+    } catch (error) {
+      console.error('⚠️ Error generando estadísticas semanales:', error);
+      // Fallback con datos de ejemplo
+      return [
+        { day: 'Lun', count: 0 },
+        { day: 'Mar', count: 0 },
+        { day: 'Mié', count: 0 },
+        { day: 'Jue', count: 0 },
+        { day: 'Vie', count: 0 },
+        { day: 'Sáb', count: 0 },
+        { day: 'Dom', count: 0 },
+      ];
     }
   };
 
@@ -104,8 +175,8 @@ export default function Dashboard() {
       bgColor: 'bg-green-500/10',
     },
     {
-      title: 'Eventos próximos',
-      value: stats.upcomingEvents.toString(),
+      title: 'Citas próximas', // Cambiado de "Eventos próximos"
+      value: stats.upcomingAppointments.toString(),
       icon: Calendar,
       color: 'text-purple-500',
       bgColor: 'bg-purple-500/10',
@@ -123,16 +194,6 @@ export default function Dashboard() {
     name: intent.charAt(0).toUpperCase() + intent.slice(1),
     value: count,
   }));
-
-  const weeklyData = [
-    { day: 'Lun', count: Math.floor(Math.random() * 50) + 10 },
-    { day: 'Mar', count: Math.floor(Math.random() * 50) + 10 },
-    { day: 'Mié', count: Math.floor(Math.random() * 50) + 10 },
-    { day: 'Jue', count: Math.floor(Math.random() * 50) + 10 },
-    { day: 'Vie', count: Math.floor(Math.random() * 50) + 10 },
-    { day: 'Sáb', count: Math.floor(Math.random() * 30) + 5 },
-    { day: 'Dom', count: Math.floor(Math.random() * 30) + 5 },
-  ];
 
   if (isLoading) {
     return (

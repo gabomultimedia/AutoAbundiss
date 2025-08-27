@@ -3,6 +3,7 @@ import { Palette, Upload, Save, Eye, EyeOff } from 'lucide-react';
 import { settingsAPI } from '../lib/api';
 import { useToast } from '../store/useToast';
 import { BrandLogo } from '../components/BrandLogo';
+import { refreshBranding } from '../lib/branding';
 
 export default function Settings() {
   const [settings, setSettings] = useState({
@@ -72,14 +73,19 @@ export default function Settings() {
       await settingsAPI.update('brand_colors', settings.brandColors);
       console.log('✅ brand_colors guardado');
       
+      // Refrescar branding en tiempo real
+      await refreshBranding();
+      console.log('✅ Branding refrescado');
+      
       addToast({
         type: 'success',
         title: 'Configuración guardada',
         message: 'Los cambios se aplicaron exitosamente',
       });
       
-      // Recargar la página para aplicar los cambios
-      window.location.reload();
+      // Forzar re-render del BrandLogo
+      window.dispatchEvent(new CustomEvent('branding-updated'));
+      
     } catch (error) {
       console.error('❌ Error guardando configuración:', error);
       addToast({

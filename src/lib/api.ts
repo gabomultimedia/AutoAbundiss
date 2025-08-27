@@ -45,42 +45,44 @@ export const authAPI = {
 
 // Conversations API
 export const conversationsAPI = {
-  getAll: async (params?: {
-    page?: number;
-    limit?: number;
-    intent?: string;
-    startDate?: string;
+  getAll: async (filters?: { 
+    limit?: number; 
+    startDate?: string; 
     endDate?: string;
-    search?: string;
+    intent?: string;
   }): Promise<{ data: Conversation[]; total: number }> => {
     let query = supabase
       .from('conversations')
       .select('*', { count: 'exact' });
 
-    if (params?.intent) {
-      query = query.eq('intent', params.intent);
-    }
-    if (params?.startDate) {
-      query = query.gte('created_at', params.startDate);
-    }
-    if (params?.endDate) {
-      query = query.lte('created_at', params.endDate);
-    }
-    if (params?.search) {
-      query = query.or(`message.ilike.%${params.search}%,reply.ilike.%${params.search}%`);
+    // Aplicar filtros de fecha si se proporcionan
+    if (filters?.startDate && filters?.endDate) {
+      query = query
+        .gte('created_at', filters.startDate)
+        .lt('created_at', filters.endDate);
     }
 
-    const page = params?.page || 1;
-    const limit = params?.limit || 10;
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
+    // Aplicar filtro de intent si se proporciona
+    if (filters?.intent) {
+      query = query.eq('intent', filters.intent);
+    }
 
-    query = query.range(from, to).order('created_at', { ascending: false });
+    // Aplicar límite si se proporciona
+    if (filters?.limit) {
+      query = query.limit(filters.limit);
+    }
+
+    // Ordenar por fecha de creación (más recientes primero)
+    query = query.order('created_at', { ascending: false });
 
     const { data, error, count } = await query;
+
     if (error) throw new Error(error.message);
 
-    return { data: data || [], total: count || 0 };
+    return { 
+      data: data || [], 
+      total: count || 0 
+    };
   },
 
   getById: async (id: string): Promise<Conversation> => {
@@ -99,25 +101,51 @@ export const conversationsAPI = {
     byIntent: Record<string, number>;
     last7Days: number;
   }> => {
-    const { data, error } = await supabase
-      .from('conversations')
-      .select('intent, created_at');
+    try {
+      console.log('📊 Obteniendo estadísticas de conversaciones...');
+      
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('intent, created_at');
 
-    if (error) throw new Error(error.message);
+      if (error) {
+        console.error('❌ Error obteniendo conversaciones:', error);
+        throw new Error(error.message);
+      }
 
-    const total = data?.length || 0;
-    const byIntent = data?.reduce((acc, conv) => {
-      acc[conv.intent] = (acc[conv.intent] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>) || {};
+      const total = data?.length || 0;
+      console.log(`✅ Total de conversaciones: ${total}`);
 
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const last7Days = data?.filter(conv => 
-      new Date(conv.created_at) >= sevenDaysAgo
-    ).length || 0;
+      // Agrupar por intent
+      const byIntent = data?.reduce((acc, conv) => {
+        const intent = conv.intent || 'sin_intent';
+        acc[intent] = (acc[intent] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>) || {};
 
-    return { total, byIntent, last7Days };
+      console.log('📈 Distribución por intents:', byIntent);
+
+      // Calcular conversaciones de los últimos 7 días
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const last7Days = data?.filter(conv => {
+        if (!conv.created_at) return false;
+        const convDate = new Date(conv.created_at);
+        return convDate >= sevenDaysAgo;
+      }).length || 0;
+
+      console.log(`📅 Conversaciones últimos 7 días: ${last7Days}`);
+
+      return { total, byIntent, last7Days };
+    } catch (error) {
+      console.error('❌ Error en getStats:', error);
+      // Retornar valores por defecto en caso de error
+      return { 
+        total: 0, 
+        byIntent: {}, 
+        last7Days: 0 
+      };
+    }
   },
 };
 

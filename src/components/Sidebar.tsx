@@ -6,7 +6,8 @@ import {
   Tag, 
   Calendar, 
   FileText, 
-  Settings 
+  Settings,
+  TestTube
 } from 'lucide-react';
 import { useAuth } from '../store/useAuth';
 import { BrandLogo } from './BrandLogo';
@@ -17,6 +18,7 @@ const navItems = [
   { name: 'Promociones', icon: Tag, path: '/promotions' },
   { name: 'Base de Conocimiento', icon: FileText, path: '/knowledge' },
   { name: 'Calendario', icon: Calendar, path: '/calendar' },
+  { name: 'Pruebas del Sistema', icon: TestTube, path: '/test-system' },
   { name: 'Configuración', icon: Settings, path: '/settings' },
 ];
 

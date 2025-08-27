@@ -76,6 +76,13 @@ export async function updateBranding(updates: Partial<Branding>): Promise<void> 
   }
 }
 
+// Función para refrescar branding en tiempo real
+export async function refreshBranding(): Promise<Branding> {
+  const branding = await getBranding();
+  applyBranding(branding);
+  return branding;
+}
+
 // Función para inicializar branding en la app
 export async function initializeBranding(): Promise<Branding> {
   const branding = await getBranding();
