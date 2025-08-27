@@ -172,7 +172,10 @@ export default function Calendar() {
                   </a>
                 )}
                 <button
-                  onClick={() => handleDeleteEvent(event.id, event.title || 'Sin título')}
+                                     onClick={() => {
+                     const title = event.title || 'Sin título';
+                     handleDeleteEvent(event.id, title as string);
+                   }}
                   className="p-1 text-muted-foreground hover:text-red-500 transition-colors"
                   title="Eliminar evento"
                 >

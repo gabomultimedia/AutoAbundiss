@@ -27,7 +27,6 @@ export default function Conversations() {
     try {
       setIsLoading(true);
       const result = await conversationsAPI.getAll({
-        page: currentPage,
         limit,
         ...filters,
       });
