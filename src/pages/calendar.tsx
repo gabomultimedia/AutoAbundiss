@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Calendar as CalendarIcon, Clock, ExternalLink } from 'lucide-react';
+import { Plus, Calendar as CalendarIcon, Clock, ExternalLink, Trash2 } from 'lucide-react';
 import { calendarAPI } from '../lib/api';
 import { useToast } from '../store/useToast';
 import type { GcalEvent } from '../lib/schema';
@@ -51,6 +51,27 @@ export default function Calendar() {
         type: 'error',
         title: 'Error creando evento',
         message: 'No se pudo crear el evento',
+      });
+    }
+  };
+
+  const handleDeleteEvent = async (eventId: string, eventTitle: string) => {
+    if (!window.confirm(`¿Estás seguro de que quieres eliminar el evento "${eventTitle}"?`)) {
+      return;
+    }
+    try {
+      await calendarAPI.deleteEvent(eventId);
+      addToast({
+        type: 'success',
+        title: 'Evento eliminado',
+        message: `El evento "${eventTitle}" ha sido eliminado.`,
+      });
+      loadEvents();
+    } catch (error) {
+      addToast({
+        type: 'error',
+        title: 'Error eliminando evento',
+        message: `No se pudo eliminar el evento "${eventTitle}".`,
       });
     }
   };
@@ -150,6 +171,13 @@ export default function Calendar() {
                     <ExternalLink className="w-4 h-4" />
                   </a>
                 )}
+                <button
+                  onClick={() => handleDeleteEvent(event.id, event.title || 'Sin título')}
+                  className="p-1 text-muted-foreground hover:text-red-500 transition-colors"
+                  title="Eliminar evento"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
 
               <h3 className="text-lg font-semibold text-foreground mb-2">

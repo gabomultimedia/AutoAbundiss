@@ -291,34 +291,62 @@ export const calendarAPI = {
     startISO: string;
     endISO: string;
     notes?: string;
+    chat_id?: string;
   }): Promise<{ id: string; htmlLink: string }> => {
-    // Convertir el formato de la API al formato del esquema de Supabase
-    const eventData = {
-      title: event.title,
-      description: event.notes,
-      start_time: event.startISO,
-      end_time: event.endISO,
-      gcal_id: `local_${Date.now()}`, // ID temporal local
-      html_link: '', // Se llenará después
-      metadata: {
-        source: 'abundiss_console',
-        created_via: 'calendar_form'
-      }
-    };
-
-    const response = await fetch(`${API_BASE}/admin-supa`, {
+    const response = await fetch(`${API_BASE}/gcal-create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'create_gcal_event', data: eventData }),
+      body: JSON.stringify(event),
     });
     
-    const result = await handleResponse<GcalEvent>(response);
+    const result = await handleResponse<{ event: { id: string; html_link: string } }>(response);
     
     return {
-      id: result.id || '',
-      htmlLink: result.html_link || ''
+      id: result.event.id || '',
+      htmlLink: result.event.html_link || ''
     };
   },
+
+  updateEvent: async (eventId: string, updates: {
+    title?: string;
+    start_time?: string;
+    end_time?: string;
+    description?: string;
+  }): Promise<GcalEvent> => {
+    const response = await fetch(`${API_BASE}/gcal-update`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventId, updates }),
+    });
+    
+    return handleResponse<GcalEvent>(response);
+  },
+
+  deleteEvent: async (eventId: string): Promise<void> => {
+    const response = await fetch(`${API_BASE}/gcal-delete`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventId }),
+    });
+    
+    await handleResponse(response);
+  },
+
+  // Función para sincronizar eventos con Google Calendar
+  syncWithGoogle: async (): Promise<{ synced: number; errors: number }> => {
+    try {
+      const response = await fetch(`${API_BASE}/gcal-list`);
+      const data = await handleResponse<{ events: GcalEvent[]; sources: { google_calendar: number; local: number } }>(response);
+      
+      return {
+        synced: data.sources.google_calendar,
+        errors: data.sources.local
+      };
+    } catch (error) {
+      console.error('Error sincronizando con Google Calendar:', error);
+      return { synced: 0, errors: 1 };
+    }
+  }
 };
 
 
